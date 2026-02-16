@@ -7,6 +7,8 @@ import { PhantomWalletAdapter, SolflareWalletAdapter } from '@solana/wallet-adap
 import { clusterApiUrl } from '@solana/web3.js'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
+import { I18nProvider } from '@/lib/i18n/context'
+import { ThemeProvider } from '@/lib/theme/context'
 
 import '@solana/wallet-adapter-react-ui/styles.css'
 
@@ -21,12 +23,16 @@ export function Providers({ children }: { children: React.ReactNode }) {
   const wallets = useMemo(() => [new PhantomWalletAdapter(), new SolflareWalletAdapter()], [])
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ConnectionProvider endpoint={endpoint}>
-        <WalletProvider wallets={wallets} autoConnect>
-          <WalletModalProvider>{children}</WalletModalProvider>
-        </WalletProvider>
-      </ConnectionProvider>
-    </QueryClientProvider>
+    <ThemeProvider>
+      <I18nProvider>
+        <QueryClientProvider client={queryClient}>
+          <ConnectionProvider endpoint={endpoint}>
+            <WalletProvider wallets={wallets} autoConnect>
+              <WalletModalProvider>{children}</WalletModalProvider>
+            </WalletProvider>
+          </ConnectionProvider>
+        </QueryClientProvider>
+      </I18nProvider>
+    </ThemeProvider>
   )
 }

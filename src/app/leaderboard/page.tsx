@@ -1,60 +1,92 @@
 'use client'
 
+import { useState } from 'react'
 import { Navbar } from '@/components/navbar'
+import { useI18n } from '@/lib/i18n/context'
+import { calculateLevel } from '@/lib/services/interfaces'
 
-const LEADERBOARD = [
-  { rank: 1, name: 'CryptoMaster.sol', wallet: '7xK...abc', points: 4250, courses: 5, certs: 4, badge: '🏆' },
-  { rank: 2, name: 'SolDev_Ana', wallet: '3mN...def', points: 3800, courses: 4, certs: 3, badge: '🥈' },
-  { rank: 3, name: 'Web3Builder', wallet: '9pQ...ghi', points: 3200, courses: 4, certs: 3, badge: '🥉' },
-  { rank: 4, name: 'AnchorPro', wallet: '5kR...jkl', points: 2900, courses: 3, certs: 2, badge: '' },
-  { rank: 5, name: 'DeFiExplorer', wallet: '2wS...mno', points: 2600, courses: 3, certs: 2, badge: '' },
-  { rank: 6, name: 'TokenDesigner', wallet: '8vT...pqr', points: 2100, courses: 2, certs: 2, badge: '' },
-  { rank: 7, name: 'NFTArtist', wallet: '4xU...stu', points: 1800, courses: 2, certs: 1, badge: '' },
-  { rank: 8, name: 'ChainLearner', wallet: '6yV...vwx', points: 1500, courses: 2, certs: 1, badge: '' },
-  { rank: 9, name: 'SolanaBR', wallet: '1zW...yza', points: 1250, courses: 1, certs: 1, badge: '' },
-  { rank: 10, name: 'NewbieNode', wallet: '0aX...bcd', points: 800, courses: 1, certs: 0, badge: '' },
-]
+const MOCK_LEADERBOARD = [
+  { rank: 1, name: 'Alice.sol', xp: 4200, streak: 14, wallet: '7xKX...m3fR' },
+  { rank: 2, name: 'Bob DeFi', xp: 3800, streak: 7, wallet: '9yRT...z4mQ' },
+  { rank: 3, name: 'Carlos Dev', xp: 3100, streak: 21, wallet: '3pMN...k8sT' },
+  { rank: 4, name: 'Diana.eth', xp: 2500, streak: 3, wallet: '5qWE...n2vR' },
+  { rank: 5, name: 'Eduardo Chain', xp: 1900, streak: 10, wallet: '8rTY...p6bX' },
+  { rank: 6, name: 'Fernanda NFT', xp: 1600, streak: 5, wallet: '2sUI...m9cZ' },
+  { rank: 7, name: 'You (SolDev.sol)', xp: 1850, streak: 5, wallet: '4tOP...q3dA', isUser: true },
+  { rank: 8, name: 'Helena Rust', xp: 900, streak: 2, wallet: '6uAS...r7eB' },
+  { rank: 9, name: 'Igor Web3', xp: 500, streak: 1, wallet: '1vDF...s4fC' },
+  { rank: 10, name: 'Julia Solana', xp: 200, streak: 4, wallet: '0wGH...t8gD' },
+].sort((a, b) => b.xp - a.xp).map((e, i) => ({ ...e, rank: i + 1 }))
 
 export default function LeaderboardPage() {
+  const { t } = useI18n()
+  const [timeframe, setTimeframe] = useState<'weekly' | 'monthly' | 'alltime'>('alltime')
+
+  const medals = ['🥇', '🥈', '🥉']
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-950 text-white">
       <Navbar />
+      <main className="mx-auto max-w-3xl px-6 py-8">
+        <h1 className="text-3xl font-bold mb-8">{t('leaderboard.title')}</h1>
 
-      <main className="mx-auto max-w-4xl px-6 py-12">
-        <h1 className="text-3xl font-bold mb-2">🏅 Ranking</h1>
-        <p className="text-gray-500 mb-8">Os melhores alunos da Superteam Academy.</p>
-
-        <div className="rounded-xl border bg-white overflow-hidden">
-          <div className="grid grid-cols-[60px_1fr_100px_80px_80px] gap-4 px-6 py-3 bg-gray-50 border-b text-xs font-medium text-gray-500 uppercase">
-            <span>#</span>
-            <span>Aluno</span>
-            <span className="text-right">Pontos</span>
-            <span className="text-center">Cursos</span>
-            <span className="text-center">Certs</span>
-          </div>
-          {LEADERBOARD.map(u => (
-            <div
-              key={u.rank}
-              className={`grid grid-cols-[60px_1fr_100px_80px_80px] gap-4 px-6 py-4 items-center border-b last:border-0 ${
-                u.rank <= 3 ? 'bg-purple-50/50' : ''
+        {/* Timeframe filter */}
+        <div className="flex gap-2 mb-6">
+          {(['weekly', 'monthly', 'alltime'] as const).map((tf) => (
+            <button
+              key={tf}
+              onClick={() => setTimeframe(tf)}
+              className={`px-4 py-2 rounded-lg text-sm transition-colors ${
+                timeframe === tf ? 'bg-purple-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
               }`}
             >
-              <span className="text-lg font-bold text-gray-400">
-                {u.badge || u.rank}
-              </span>
-              <div>
-                <div className="font-medium">{u.name}</div>
-                <div className="text-xs text-gray-400 font-mono">{u.wallet}</div>
-              </div>
-              <div className="text-right font-semibold text-purple-600">{u.points.toLocaleString()}</div>
-              <div className="text-center text-sm">{u.courses}</div>
-              <div className="text-center text-sm">{u.certs}</div>
+              {t(`leaderboard.${tf}`)}
+            </button>
+          ))}
+        </div>
+
+        {/* Top 3 podium */}
+        <div className="grid grid-cols-3 gap-4 mb-8">
+          {MOCK_LEADERBOARD.slice(0, 3).map((entry, i) => (
+            <div key={entry.rank} className={`text-center p-4 rounded-xl border ${
+              i === 0 ? 'bg-yellow-900/20 border-yellow-600/30 order-2' :
+              i === 1 ? 'bg-gray-800/50 border-gray-700 order-1' :
+              'bg-orange-900/20 border-orange-700/30 order-3'
+            }`}>
+              <div className="text-3xl mb-2">{medals[i]}</div>
+              <div className="font-bold">{entry.name}</div>
+              <div className="text-purple-400 font-bold mt-1">{entry.xp.toLocaleString()} XP</div>
+              <div className="text-xs text-gray-400">Level {calculateLevel(entry.xp)}</div>
+              <div className="text-xs text-orange-400 mt-1">🔥 {entry.streak}d</div>
             </div>
           ))}
         </div>
 
-        <div className="mt-6 text-center text-sm text-gray-500">
-          Ganhe pontos completando lições e quizzes. Certificados NFT são emitidos ao concluir cursos.
+        {/* Full ranking */}
+        <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+          {MOCK_LEADERBOARD.map((entry) => (
+            <div
+              key={entry.rank}
+              className={`flex items-center gap-4 px-4 py-3 border-b border-gray-800 last:border-0 ${
+                (entry as any).isUser ? 'bg-purple-900/20' : ''
+              }`}
+            >
+              <div className={`w-8 text-center font-bold ${entry.rank <= 3 ? 'text-yellow-400' : 'text-gray-500'}`}>
+                {entry.rank <= 3 ? medals[entry.rank - 1] : `#${entry.rank}`}
+              </div>
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-sm font-bold">
+                {entry.name[0]}
+              </div>
+              <div className="flex-1">
+                <div className={`font-medium ${(entry as any).isUser ? 'text-purple-400' : ''}`}>{entry.name}</div>
+                <div className="text-xs text-gray-500 font-mono">{entry.wallet}</div>
+              </div>
+              <div className="text-right">
+                <div className="font-bold text-purple-400">{entry.xp.toLocaleString()} XP</div>
+                <div className="text-xs text-gray-500">Lv. {calculateLevel(entry.xp)} · 🔥 {entry.streak}d</div>
+              </div>
+            </div>
+          ))}
         </div>
       </main>
     </div>

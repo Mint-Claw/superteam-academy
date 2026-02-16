@@ -1,135 +1,154 @@
 'use client'
 
 import Link from 'next/link'
-import { useWallet } from '@solana/wallet-adapter-react'
 import { Navbar } from '@/components/navbar'
+import { useI18n } from '@/lib/i18n/context'
+import { calculateLevel, levelProgress } from '@/lib/services/interfaces'
 
-// Mock progress data — in production comes from DB/on-chain
-const MY_COURSES = [
-  { slug: 'intro-solana', title: 'Introdução ao Solana', progress: 75, icon: '☀️', nextLesson: 'l1-2-1', nextLessonTitle: 'Programa SPL Token' },
-  { slug: 'web3-frontend', title: 'Frontend Web3 com Next.js', progress: 30, icon: '🖥️', nextLesson: 'l5-1-1', nextLessonTitle: 'Conectando Wallets' },
+const MOCK_XP = 1850
+const MOCK_STREAK = 5
+
+const MOCK_COURSES = [
+  { slug: 'intro-solana', title: 'Introdução ao Solana', icon: '☀️', progress: 75, nextLesson: 'Tokens SPL' },
+  { slug: 'anchor-contracts', title: 'Smart Contracts com Anchor', icon: '⚓', progress: 30, nextLesson: 'Anatomia de um Programa' },
+  { slug: 'defi-pratica', title: 'DeFi na Prática', icon: '💰', progress: 0, nextLesson: 'O que é um AMM?' },
 ]
 
-const CERTIFICATES = [
-  { course: 'Tokenomics & Economia Cripto', date: '2026-01-15', mint: '7xK...abc', slug: 'tokenomics' },
+const MOCK_ACTIVITY = [
+  { text: 'Completou: O que é Proof of History?', time: '2h atrás', xp: '+25 XP' },
+  { text: 'Quiz aprovado: Fundamentos Solana', time: '3h atrás', xp: '+50 XP' },
+  { text: 'Streak bonus! 5 dias consecutivos 🔥', time: '1d atrás', xp: '+10 XP' },
+  { text: 'Inscrito: DeFi na Prática', time: '2d atrás', xp: '' },
 ]
 
-const RECENT_ACTIVITY = [
-  { action: 'Completou quiz', detail: 'Fundamentos do Solana — 100%', time: 'Há 2 horas', icon: '📝' },
-  { action: 'Iniciou módulo', detail: 'Tokens & Programas', time: 'Há 3 horas', icon: '📚' },
-  { action: 'Certificado emitido', detail: 'Tokenomics & Economia Cripto', time: 'Há 2 dias', icon: '🏆' },
+const MOCK_ACHIEVEMENTS = [
+  { icon: '🌱', name: 'Primeiros Passos', unlocked: true },
+  { icon: '🔥', name: 'Semana Guerreira', unlocked: true },
+  { icon: '🦀', name: 'Rust Rookie', unlocked: false },
+  { icon: '⭐', name: 'Early Adopter', unlocked: true },
+  { icon: '💯', name: 'Nota Perfeita', unlocked: false },
+  { icon: '🏃', name: 'Speed Runner', unlocked: false },
 ]
 
 export default function DashboardPage() {
-  const { publicKey, connected } = useWallet()
+  const { t } = useI18n()
+  const level = calculateLevel(MOCK_XP)
+  const progress = levelProgress(MOCK_XP)
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-950 text-white">
       <Navbar />
+      <main className="mx-auto max-w-6xl px-6 py-8">
+        <h1 className="text-3xl font-bold mb-8">{t('dashboard.title')}</h1>
 
-      <main className="mx-auto max-w-6xl px-6 py-12">
-        {!connected ? (
-          <div className="text-center py-20">
-            <div className="text-5xl mb-4">🔐</div>
-            <h2 className="text-2xl font-bold mb-2">Conecte sua Wallet</h2>
-            <p className="text-gray-500">Conecte sua wallet Solana para acessar seu dashboard.</p>
+        {/* Stats row */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+          <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
+            <div className="text-sm text-gray-400">{t('dashboard.xp')}</div>
+            <div className="text-2xl font-bold text-purple-400">{MOCK_XP.toLocaleString()}</div>
           </div>
-        ) : (
-          <>
-            <div className="flex items-center gap-3 mb-8">
-              <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center text-xl">👤</div>
-              <div>
-                <h1 className="text-xl font-bold">Meu Dashboard</h1>
-                <p className="text-sm text-gray-500 font-mono">{publicKey?.toBase58().slice(0, 8)}...{publicKey?.toBase58().slice(-4)}</p>
+          <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
+            <div className="text-sm text-gray-400">{t('dashboard.level')}</div>
+            <div className="text-2xl font-bold">{level}</div>
+            <div className="w-full bg-gray-700 rounded-full h-1.5 mt-2">
+              <div className="bg-purple-500 h-1.5 rounded-full" style={{ width: `${progress}%` }} />
+            </div>
+          </div>
+          <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
+            <div className="text-sm text-gray-400">{t('dashboard.streak')}</div>
+            <div className="text-2xl font-bold text-orange-400">{MOCK_STREAK} 🔥</div>
+          </div>
+          <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
+            <div className="text-sm text-gray-400">{t('leaderboard.rank')}</div>
+            <div className="text-2xl font-bold">#7</div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* My Courses */}
+          <div className="lg:col-span-2 space-y-4">
+            <h2 className="text-xl font-bold">{t('dashboard.my_courses')}</h2>
+            {MOCK_COURSES.map((c) => (
+              <Link key={c.slug} href={`/courses/${c.slug}`} className="block bg-gray-900 rounded-xl p-4 border border-gray-800 hover:border-purple-500/50 transition">
+                <div className="flex items-center gap-4">
+                  <span className="text-3xl">{c.icon}</span>
+                  <div className="flex-1">
+                    <h3 className="font-semibold">{c.title}</h3>
+                    <div className="text-sm text-gray-400 mt-1">{t('dashboard.next_lesson')}: {c.nextLesson}</div>
+                    <div className="flex items-center gap-3 mt-2">
+                      <div className="flex-1 bg-gray-700 rounded-full h-2">
+                        <div className="bg-purple-500 h-2 rounded-full transition-all" style={{ width: `${c.progress}%` }} />
+                      </div>
+                      <span className="text-sm text-gray-400">{c.progress}%</span>
+                    </div>
+                  </div>
+                  <span className="text-purple-400 text-sm">{c.progress > 0 ? t('courses.continue') : t('courses.enroll')} →</span>
+                </div>
+              </Link>
+            ))}
+
+            {/* Recommended */}
+            <h2 className="text-xl font-bold mt-8">{t('dashboard.recommended')}</h2>
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                { title: 'Marketplace de NFTs', icon: '🎨', xp: 800 },
+                { title: 'Frontend Web3', icon: '🖥️', xp: 600 },
+              ].map((c, i) => (
+                <div key={i} className="bg-gray-900 rounded-xl p-4 border border-gray-800 hover:border-purple-500/50 transition cursor-pointer">
+                  <span className="text-2xl">{c.icon}</span>
+                  <h3 className="font-semibold mt-2">{c.title}</h3>
+                  <span className="text-xs text-purple-400">+{c.xp} XP</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Streak Calendar (simplified) */}
+            <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
+              <h3 className="font-semibold mb-3">{t('dashboard.streak')} 🔥</h3>
+              <div className="grid grid-cols-7 gap-1">
+                {Array.from({ length: 28 }, (_, i) => {
+                  const active = i >= 23 // last 5 days
+                  return (
+                    <div key={i} className={`w-full aspect-square rounded-sm ${active ? 'bg-green-500' : 'bg-gray-800'}`} />
+                  )
+                })}
+              </div>
+              <div className="text-center text-sm text-gray-400 mt-2">{MOCK_STREAK} {t('dashboard.days')} consecutivos</div>
+            </div>
+
+            {/* Achievements */}
+            <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
+              <h3 className="font-semibold mb-3">{t('dashboard.achievements')}</h3>
+              <div className="grid grid-cols-3 gap-2">
+                {MOCK_ACHIEVEMENTS.map((a, i) => (
+                  <div key={i} className={`text-center p-2 rounded-lg ${a.unlocked ? 'bg-gray-800' : 'bg-gray-800/50 opacity-40'}`}>
+                    <div className="text-2xl">{a.icon}</div>
+                    <div className="text-xs mt-1 text-gray-400">{a.name}</div>
+                  </div>
+                ))}
               </div>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12">
-              {[
-                { label: 'Cursos Ativos', value: '2', icon: '📚' },
-                { label: 'Lições Completas', value: '42', icon: '✅' },
-                { label: 'Certificados', value: '1', icon: '🏆' },
-                { label: 'Pontos', value: '1,250', icon: '⭐' },
-              ].map((s, i) => (
-                <div key={i} className="rounded-xl border bg-white p-5">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-gray-500">{s.label}</span>
-                    <span className="text-xl">{s.icon}</span>
-                  </div>
-                  <div className="text-2xl font-bold">{s.value}</div>
-                </div>
-              ))}
-            </div>
-
-            {/* Active Courses */}
-            <h2 className="text-xl font-bold mb-4">Meus Cursos</h2>
-            <div className="grid sm:grid-cols-2 gap-4 mb-12">
-              {MY_COURSES.map(c => (
-                <div key={c.slug} className="rounded-xl border bg-white p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <span className="text-2xl">{c.icon}</span>
-                    <Link href={`/courses/${c.slug}`} className="font-semibold hover:text-purple-600">{c.title}</Link>
-                  </div>
-                  <div className="mb-3">
-                    <div className="flex justify-between text-sm mb-1">
-                      <span className="text-gray-500">Progresso</span>
-                      <span className="font-medium">{c.progress}%</span>
-                    </div>
-                    <div className="h-2 rounded-full bg-gray-100 overflow-hidden">
-                      <div className="h-full rounded-full bg-purple-600 transition-all" style={{ width: `${c.progress}%` }} />
-                    </div>
-                  </div>
-                  <Link
-                    href={`/courses/${c.slug}/lessons/${c.nextLesson}`}
-                    className="text-sm text-purple-600 hover:text-purple-700"
-                  >
-                    Continuar: {c.nextLessonTitle} →
-                  </Link>
-                </div>
-              ))}
-            </div>
-
-            {/* Recent Activity */}
-            <h2 className="text-xl font-bold mb-4">Atividade Recente</h2>
-            <div className="rounded-xl border bg-white divide-y mb-12">
-              {RECENT_ACTIVITY.map((a, i) => (
-                <div key={i} className="flex items-center gap-4 px-6 py-4">
-                  <span className="text-xl">{a.icon}</span>
-                  <div className="flex-1">
-                    <div className="text-sm font-medium">{a.action}</div>
-                    <div className="text-xs text-gray-500">{a.detail}</div>
-                  </div>
-                  <span className="text-xs text-gray-400">{a.time}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Certificates */}
-            <h2 className="text-xl font-bold mb-4">Certificados NFT</h2>
-            <div className="space-y-3">
-              {CERTIFICATES.map((cert, i) => (
-                <div key={i} className="flex items-center justify-between rounded-xl border bg-white p-5">
-                  <div className="flex items-center gap-3">
-                    <span className="text-3xl">🏆</span>
+            {/* Activity */}
+            <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
+              <h3 className="font-semibold mb-3">{t('dashboard.recent_activity')}</h3>
+              <div className="space-y-3">
+                {MOCK_ACTIVITY.map((a, i) => (
+                  <div key={i} className="flex items-start justify-between text-sm">
                     <div>
-                      <div className="font-medium">{cert.course}</div>
-                      <div className="text-sm text-gray-500">Emitido em {cert.date}</div>
+                      <div className="text-gray-300">{a.text}</div>
+                      <div className="text-xs text-gray-500">{a.time}</div>
                     </div>
+                    {a.xp && <span className="text-purple-400 text-xs whitespace-nowrap">{a.xp}</span>}
                   </div>
-                  <a
-                    href={`https://explorer.solana.com/address/${cert.mint}?cluster=devnet`}
-                    target="_blank"
-                    rel="noopener"
-                    className="text-sm text-purple-600 hover:underline"
-                  >
-                    Ver no Explorer →
-                  </a>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </>
-        )}
+          </div>
+        </div>
       </main>
     </div>
   )
