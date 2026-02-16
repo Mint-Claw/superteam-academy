@@ -1,107 +1,170 @@
-# Superteam Academy — Learning Management System dApp
+# 🎓 Superteam Academy — Decentralized LMS on Solana
 
-A Solana-powered Learning Management System for Superteam Brazil, enabling decentralized education with on-chain credentials and token-gated access.
+A full-featured **Learning Management System** built for [Superteam Brazil](https://superteam.fun/) on the **Solana blockchain**. Students learn Web3 development through structured courses, earn points, pass quizzes, and receive **compressed NFT certificates** on-chain.
 
-## Features
+> **Bounty Submission**: Superteam Brazil Academy LMS ($4,800)
 
-- 🎓 **Course Management** — Create, organize, and publish courses with modules and lessons
-- 📜 **On-Chain Certificates** — NFT-based completion certificates (compressed NFTs via Metaplex Bubblegum)
-- 🔐 **Token-Gated Access** — Gate courses by SPL token holdings or NFT ownership
-- 📊 **Progress Tracking** — Track learner progress with on-chain checkpoints
-- 👥 **Roles** — Admin, Instructor, Student with Solana wallet auth
-- 🏆 **Leaderboard** — Points and rankings for community engagement
-- 🌐 **Multilingual** — Portuguese (BR) + English
+## ✨ Features
 
-## Tech Stack
+### 📚 Course Platform
+- **6 courses** covering Solana fundamentals, Anchor smart contracts, DeFi, NFTs, Web3 frontend, and tokenomics
+- **Structured curriculum**: Modules → Lessons → Quizzes
+- **Rich lesson content** with code examples, tables, and interactive elements
+- **Difficulty filtering** (Beginner, Intermediate, Advanced)
+- **Search** across course catalog
+- **Full Portuguese (pt-BR) localization**
 
-### Frontend
-- **Next.js 14** (App Router)
-- **TypeScript**
-- **Tailwind CSS** + **shadcn/ui**
-- **@solana/wallet-adapter** for wallet connection
-- **React Query** for data fetching
+### 🎯 Interactive Quizzes
+- Multiple-choice quiz engine with instant feedback
+- Visual correct/incorrect indicators
+- Score calculation with 70% pass threshold
+- On-chain progress checkpointing
 
-### Backend
-- **Next.js API Routes** (serverless)
-- **PostgreSQL** (Supabase) for off-chain data
-- **Prisma ORM**
-- **Anchor** programs for on-chain logic
+### 🏆 Gamification
+- **Points system** for completing lessons and quizzes
+- **Leaderboard** ranking top students
+- **Progress tracking** with visual progress bars
+- **Activity feed** on student dashboard
 
-### Blockchain
-- **Solana** (devnet → mainnet)
-- **Anchor Framework** for smart contracts
-- **Metaplex Bubblegum** for compressed NFT certificates
-- **SPL Tokens** for rewards/gating
+### 🔐 Solana Integration
+- **Wallet connection** via Phantom & Solflare (wallet-adapter)
+- **Compressed NFT certificates** via Metaplex Bubblegum (~$0.001/cert)
+- **Token-gated courses** (SPL token verification)
+- **On-chain checkpoints** for quiz progress
+- **Anchor smart contract** for Academy state management
 
-## Architecture
+### 🏗️ Architecture
+- **Next.js 14** with App Router & TypeScript
+- **Tailwind CSS** for responsive, modern UI
+- **Prisma** ORM with PostgreSQL
+- **Solana wallet-adapter** for Web3 connectivity
+- **Metaplex Bubblegum** for compressed NFT minting
+- **TanStack Query** for data fetching
 
-```
-┌─────────────────────────────────────────────┐
-│              Next.js Frontend                │
-│  (Courses, Dashboard, Certificates, Admin)  │
-└──────────────────┬──────────────────────────┘
-                   │
-         ┌─────────┴─────────┐
-         │   API Routes       │
-         │  (REST + tRPC)     │
-         └────┬──────────┬────┘
-              │          │
-    ┌─────────┘          └──────────┐
-    │  Supabase/PostgreSQL          │  Solana RPC
-    │  (courses, users,             │  (certificates,
-    │   progress, content)          │   token gates,
-    │                               │   checkpoints)
-    └───────────────────────────────┘
-```
-
-## Getting Started
+## 🚀 Quick Start
 
 ```bash
-# Install dependencies
-pnpm install
+# Clone
+git clone https://github.com/Mint-Claw/superteam-academy.git
+cd superteam-academy
 
-# Set up environment
-cp .env.example .env.local
+# Install
+npm install
 
-# Run database migrations
-pnpm db:push
+# Environment
+cp .env.example .env
+# Edit .env with your database URL and Solana RPC
 
-# Start development server
-pnpm dev
+# Database (optional — app works with mock data)
+npx prisma db push
+npm run db:seed
+
+# Run
+npm run dev
 ```
 
-## Project Structure
+Visit [http://localhost:3000](http://localhost:3000)
+
+## 📂 Project Structure
 
 ```
-src/
-├── app/                    # Next.js App Router pages
-│   ├── (auth)/            # Auth pages (connect wallet)
-│   ├── (dashboard)/       # Student dashboard
-│   ├── (admin)/           # Admin/instructor pages
-│   ├── courses/           # Course catalog & viewer
-│   └── api/               # API routes
-├── components/            # React components
-│   ├── ui/               # shadcn/ui components
-│   ├── course/           # Course-specific components
-│   ├── wallet/           # Wallet connection
-│   └── layout/           # Layout components
-├── lib/                   # Utilities
-│   ├── solana/           # Solana client helpers
-│   ├── db/               # Prisma client
-│   └── auth/             # Auth helpers
-├── programs/              # Anchor smart contracts
-│   └── superteam-academy/
-└── prisma/               # Database schema
+superteam-academy/
+├── src/
+│   ├── app/
+│   │   ├── page.tsx                    # Landing page (Portuguese)
+│   │   ├── courses/
+│   │   │   ├── page.tsx                # Course catalog with filters
+│   │   │   └── [slug]/
+│   │   │       ├── page.tsx            # Course detail & curriculum
+│   │   │       └── lessons/
+│   │   │           └── [lessonId]/
+│   │   │               └── page.tsx    # Lesson viewer & quiz engine
+│   │   ├── dashboard/
+│   │   │   └── page.tsx                # Student dashboard
+│   │   ├── leaderboard/
+│   │   │   └── page.tsx                # Points ranking
+│   │   └── api/
+│   │       ├── courses/route.ts        # Course CRUD
+│   │       ├── progress/route.ts       # Progress tracking
+│   │       └── certificates/route.ts   # NFT certificate minting
+│   ├── components/
+│   │   ├── navbar.tsx                  # Shared navigation
+│   │   └── providers.tsx               # Solana + React Query providers
+│   └── lib/
+│       ├── courses-data.ts             # Course catalog & content
+│       └── solana/
+│           ├── certificates.ts         # Bubblegum compressed NFT minting
+│           └── token-gate.ts           # SPL token verification
+├── prisma/
+│   └── schema.prisma                   # Database schema
+├── programs/                           # Anchor smart contract
+│   └── academy/
+│       └── src/lib.rs
+└── tailwind.config.ts
 ```
 
-## Smart Contract
+## 🔗 Solana Features Deep Dive
 
-The Anchor program handles:
-- Certificate minting (compressed NFTs)
-- Course registration checkpoints
-- Token-gated access verification
-- Instructor authorization
+### Compressed NFT Certificates
+Using **Metaplex Bubblegum**, certificates are minted as compressed NFTs on a Merkle tree. A single tree (maxDepth=14) supports ~16,384 certificates at ~$0.001 each.
 
-## License
+```typescript
+// Certificate minting flow
+const umi = createUmiClient(authoritySecret)
+const result = await mintCertificate(umi, MERKLE_TREE, {
+  name: 'Superteam Academy - Intro to Solana',
+  symbol: 'STCERT',
+  uri: metadataUri,
+  courseName: 'Introdução ao Solana',
+  studentWallet: '7xK...',
+  completionDate: '2026-02-16',
+  grade: 'A',
+})
+```
 
-MIT
+### Token-Gated Courses
+Advanced courses can require SPL token holdings for access:
+
+```typescript
+// Verify token holdings before granting access
+const hasAccess = await verifyTokenHolding(
+  connection,
+  walletPublicKey,
+  requiredTokenMint,
+  minimumAmount
+)
+```
+
+### On-Chain Progress
+Quiz completions are recorded as checkpoints on-chain via the Academy Anchor program, creating a verifiable learning history.
+
+## 🌐 Deployment
+
+### Vercel (Recommended)
+```bash
+npm run build
+vercel deploy
+```
+
+### Docker
+```bash
+docker build -t superteam-academy .
+docker run -p 3000:3000 superteam-academy
+```
+
+## 🗺️ Roadmap
+
+- [ ] Real-time collaboration (study groups)
+- [ ] Video lessons with embedded coding exercises
+- [ ] DAO governance for course curation
+- [ ] Mobile app (React Native)
+- [ ] Multi-language support (Spanish, English)
+- [ ] Integration with Superteam Earn for bounty-based learning
+
+## 📄 License
+
+MIT — Built for the Superteam Brazil community.
+
+---
+
+**Built with ❤️ for Superteam Brazil** | [superteam.fun](https://superteam.fun/)
