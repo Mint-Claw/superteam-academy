@@ -19,6 +19,7 @@ export interface Lesson {
   videoUrl?: string
   quiz?: QuizQuestion[]
   order: number
+  xp?: number
 }
 
 export interface Module {

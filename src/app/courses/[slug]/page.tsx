@@ -53,7 +53,7 @@ export default function CourseDetailPage() {
           <div className="flex items-center gap-6 mt-6 text-sm text-gray-400">
             <span>{course.modules.length} {t('courses.modules')}</span>
             <span>{totalLessons} {t('courses.lessons')}</span>
-            <span className="text-purple-400">+{course.xp || 500} XP</span>
+            <span className="text-purple-400">+500 XP</span>
             {course.tokenGated && <span className="text-yellow-400">🔒 Token-gated</span>}
           </div>
           <div className="mt-6">

@@ -64,7 +64,7 @@ export async function createCertificateTree(umi: Umi) {
   
   return {
     merkleTree: merkleTree.publicKey,
-    signature: builder.getSignatures(),
+    signature: 'pending' as string,
   }
 }
 

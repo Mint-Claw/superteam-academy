@@ -158,7 +158,7 @@ export default function LessonPage() {
             <h1 className="text-2xl font-bold">{lesson.titlePt || lesson.title}</h1>
             <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
               <span>{lesson.type === 'QUIZ' ? '📝 Quiz' : lesson.type === 'VIDEO' ? '🎬 Video' : '📖 Reading'}</span>
-              {lesson.xp && <span className="text-purple-400">+{lesson.xp} XP</span>}
+              {/* XP display reserved for future use */}
             </div>
           </div>
 
