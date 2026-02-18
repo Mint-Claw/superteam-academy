@@ -1,12 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { getLesson, getCourse, getAllLessonsFlat } from '@/lib/courses-data'
 import { Navbar } from '@/components/navbar'
 import { CodeEditor } from '@/components/code-editor'
 import { useI18n } from '@/lib/i18n/context'
+import { useProgress } from '@/lib/hooks/use-progress'
 import type { QuizQuestion } from '@/lib/courses-data'
 
 function QuizComponent({ questions }: { questions: QuizQuestion[] }) {
@@ -109,8 +110,13 @@ export default function LessonPage() {
   const { slug, lessonId } = useParams<{ slug: string; lessonId: string }>()
   const [showHint, setShowHint] = useState(false)
   const [showSolution, setShowSolution] = useState(false)
-  const [completed, setCompleted] = useState(false)
+  const { completeLesson: markComplete, isCompleted: checkCompleted } = useProgress(slug)
   const data = getLesson(slug, lessonId)
+  const [completed, setCompleted] = useState(false)
+
+  useEffect(() => {
+    if (checkCompleted(lessonId)) setCompleted(true)
+  }, [lessonId, checkCompleted])
 
   if (!data) {
     return (
@@ -233,7 +239,7 @@ export default function LessonPage() {
           ) : <div />}
 
           <button
-            onClick={() => setCompleted(true)}
+            onClick={() => { setCompleted(true); markComplete(lessonId) }}
             className={`px-6 py-2 rounded-lg text-sm font-medium transition-all ${
               completed
                 ? 'bg-green-600 text-white cursor-default'

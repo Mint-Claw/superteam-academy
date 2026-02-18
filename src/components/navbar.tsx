@@ -14,6 +14,7 @@ export function Navbar() {
   const navLinks = [
     { href: '/', label: t('nav.home') },
     { href: '/courses', label: t('nav.courses') },
+    { href: '/paths', label: 'Trilhas' },
     { href: '/dashboard', label: t('nav.dashboard') },
     { href: '/leaderboard', label: t('nav.leaderboard') },
   ];
@@ -52,9 +53,14 @@ export function Navbar() {
             {theme === 'dark' ? '☀️' : '🌙'}
           </button>
           {connected && (
-            <Link href="/profile" className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-gray-800 transition-colors">
-              👤
-            </Link>
+            <>
+              <Link href="/profile" className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-gray-800 transition-colors">
+                👤
+              </Link>
+              <Link href="/admin" className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-gray-800 transition-colors text-sm">
+                ⚙️
+              </Link>
+            </>
           )}
           <WalletMultiButton className="!bg-purple-600 !hover:bg-purple-500 !rounded-lg !h-9 !text-sm" />
         </div>
